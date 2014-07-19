@@ -29,13 +29,14 @@ ls = (req, res) ->
 	# todo get list of databases from data dir
 	res.send(["docs"])
 
-# GET ':db/:collection' handler
+# GET :db/:collection handler
+# TODO support ?selector={}
 get_collection = (req, res) ->
 	db = load_db req
 	db.find {}, (err, docs) ->
 		send_docs(res, err, docs)
 
-# GET ':db/:collection/:id' handler
+# GET :db/:collection/:id handler
 get_doc = (req, res, doc_handler) ->
 	db = load_db req
 	id = req.params.id
@@ -44,7 +45,7 @@ get_doc = (req, res, doc_handler) ->
 		json = if doc_handler then doc_handler(doc) else serialize_doc(doc)
 		res.send json
 
-# DELETE ':db/:collection/:id' handler
+# DELETE :db/:collection/:id handler
 del_doc = (req, res) ->
 	db = load_db req
 	id = req.params.id
@@ -52,7 +53,7 @@ del_doc = (req, res) ->
 		return res.send {error: err} if err
 		res.send {ok: numRemoved}
 
-# POST ':db/:collection' handler
+# POST :db/:collection handler
 add_doc = (req, res) ->
 	db = load_db req
 	doc = req.body
@@ -90,10 +91,11 @@ update_doc = (req, res, update_handler) ->
 get_meta = (req, res) ->
 	get_doc req, res, (doc) -> doc.$metadata
 
+# TODO update metadata
 update_meta = (req, res) ->
 	update_doc req, res, (doc) -> doc.$metadata
 
-# export app plugin
+# export express app plugin
 module.exports = (app) ->
 	# collections api
 	app.get ':db', ls
