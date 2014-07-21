@@ -2,6 +2,26 @@
 path = require 'path'
 Nedb = require 'nedb'
 
+# export express app plugin
+module.exports = (app) ->
+	# collections api
+	app.get ':db', ls
+	app.get ':db/:collection', get_collection
+
+	# docs api
+	app.get ':db/:collection/:id', get_doc
+	app.del ':db/:collection/:id', del_doc
+	app.update ':db/:collection/:id', update_doc
+	app.post ':db/:collection', add_doc
+
+	# metadata
+	app.get ':db/:collection/:id/metadata', get_meta
+	app.update ':db/:collection/:id/metadata', update_meta
+	
+	# TODO permissions
+	# app.get ':db/:collection/:id/permissions', get_permissions
+	# app.update ':db/:collection/:id/permissions', update_permissions
+
 # dirs
 root = path.dirname __dirname
 datadir = path.join root, 'data'
@@ -29,14 +49,14 @@ ls = (req, res) ->
 	# todo get list of databases from data dir
 	res.send(["docs"])
 
-# GET :db/:collection handler
+# GET db/collection handler
 # TODO support ?selector={}
 get_collection = (req, res) ->
 	db = load_db req
 	db.find {}, (err, docs) ->
 		send_docs(res, err, docs)
 
-# GET :db/:collection/:id handler
+# GET db/collection/id handler
 get_doc = (req, res, doc_handler) ->
 	db = load_db req
 	id = req.params.id
@@ -45,7 +65,7 @@ get_doc = (req, res, doc_handler) ->
 		json = if doc_handler then doc_handler(doc) else serialize_doc(doc)
 		res.send json
 
-# DELETE :db/:collection/:id handler
+# DELETE db/collection/id handler
 del_doc = (req, res) ->
 	db = load_db req
 	id = req.params.id
@@ -53,7 +73,7 @@ del_doc = (req, res) ->
 		return res.send {error: err} if err
 		res.send {ok: numRemoved}
 
-# POST :db/:collection handler
+# POST db/collection handler
 add_doc = (req, res) ->
 	db = load_db req
 	doc = req.body
@@ -70,7 +90,7 @@ add_doc = (req, res) ->
 		newDoc.$metadata.id = newDoc._id
 		res.send serialize_doc(newDoc)
 
-# UPDATE :db/:collection/:id
+# UPDATE db/collection/id
 update_doc = (req, res, update_handler) ->
 	db = load_db req
 	id = req.params.id
@@ -87,7 +107,7 @@ update_doc = (req, res, update_handler) ->
 			return res.send {error: err} if err
 			res.send serialize_doc(doc)
 
-# GET :db/:collection/:id/metadata
+# GET db/collection/id/metadata
 get_meta = (req, res) ->
 	get_doc req, res, (doc) -> doc.$metadata
 
@@ -95,18 +115,3 @@ get_meta = (req, res) ->
 update_meta = (req, res) ->
 	update_doc req, res, (doc) -> doc.$metadata
 
-# export express app plugin
-module.exports = (app) ->
-	# collections api
-	app.get ':db', ls
-	app.get ':db/:collection', get_collection
-
-	# docs api
-	app.get ':db/:collection/:id', get_doc
-	app.del ':db/:collection/:id', del_doc
-	app.update ':db/:collection/:id', update_doc
-	app.post ':db/:collection', add_doc
-
-	# metadata
-	app.get ':db/:collection/:id/metadata', get_meta
-	app.update ':db/:collection/:id/metadata', update_meta
