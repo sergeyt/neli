@@ -1,4 +1,3 @@
-nedb-rest
-=========
+# neli
 
 REST server for NeDB

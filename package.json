@@ -1,7 +1,7 @@
 {
-  "name": "nedb-rest",
+  "name": "neli",
   "version": "0.0.0",
-  "description": "nedb rest server",
+  "description": "NeDB REST server",
   "author": "Sergey Todyshev <stodyshev@gmail.com>",
   "main": "index.js",
   "keywords": [
