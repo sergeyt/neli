@@ -9,7 +9,7 @@
     "ars"
   ],
   "contributors": [
-    "Sergey Todyshev <stodyshev@gmail.com>"
+    "sergeyt <stodyshev@gmail.com>"
   ],
   "dependencies": {
     "coffee-script": "~1.7",
