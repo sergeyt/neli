@@ -11,28 +11,27 @@ app.set 'host', 'http://localhost:' + app.get('port')
 app.set 'view engine', 'jade'
 app.set 'views', root + '/views'
 
-app.configure ->
-	# config middlewares
-	# Prevent any problem with CORS
-	app.use (req, res, next) ->
-		res.header 'Access-Control-Allow-Origin', '*'
-		next()
+# config middlewares
+# Prevent any problem with CORS
+app.use (req, res, next) ->
+	res.header 'Access-Control-Allow-Origin', '*'
+	next()
 
-	app.use(express.logger({ format: 'dev' }))
-	app.use(express.compress())
-	app.use(express.methodOverride())
-	app.use(express.cookieParser())
-	app.use(express.bodyParser())
+app.use(require('morgan')("dev", {}))
+app.use(require('compression')())
+app.use(require('cookie-parser')())
+app.use(require('body-parser')())
+app.use(require('method-override')())
 
-	# static content
-	app.use '/public', express.static root + '/public'
+# static content
+app.use '/public', express.static root + '/public'
 
 # http handlers
 app.get '/', (req, res) ->
 	res.render 'index', {wikis: populateWikis()}
 
 # inject docs rest interface
-require('./docs')(app);
+require('./rest')(app);
 
 # error handler
 app.use (req, res) ->

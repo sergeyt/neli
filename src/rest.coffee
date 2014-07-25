@@ -6,21 +6,28 @@ Nedb = require 'nedb'
 module.exports = (app) ->
 	# collections api
 	app.get ':db', ls
-	app.get ':db/:collection', get_collection
+	app.route(':db/:collection')
+		.get(get_collection)
+		.post(add_doc)
 
 	# docs api
-	app.get ':db/:collection/:id', get_doc
-	app.del ':db/:collection/:id', del_doc
-	app.update ':db/:collection/:id', update_doc
-	app.post ':db/:collection', add_doc
+	app.route(':db/:collection/:id')
+		.get(get_doc)
+		.delete(del_doc)
+		# TODO fix
+		#.update(update_doc)
 
 	# metadata
-	app.get ':db/:collection/:id/metadata', get_meta
-	app.update ':db/:collection/:id/metadata', update_meta
+	app.route(':db/:collection/:id/metadata')
+		.get(get_meta)
+		# TODO fix
+		#.update(update_meta)
 	
-	# TODO permissions
-	# app.get ':db/:collection/:id/permissions', get_permissions
-	# app.update ':db/:collection/:id/permissions', update_permissions
+	# permissions
+	app.route(':db/:collection/:id/permissions')
+		.get(get_permissions)
+		# TODO fix
+		#.update(set_permissions)
 
 # dirs
 root = path.dirname __dirname
@@ -114,4 +121,9 @@ get_meta = (req, res) ->
 # TODO update metadata
 update_meta = (req, res) ->
 	update_doc req, res, (doc) -> doc.$metadata
+
+# TODO permissions
+get_permissions = (req, res) ->
+
+set_permissions = (req, res) ->
 
