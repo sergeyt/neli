@@ -19,8 +19,6 @@ app = express()
 # configure express app
 app.set 'port', process.env.PORT || 1111
 app.set 'host', 'http://localhost:' + app.get('port')
-app.set 'view engine', 'jade'
-app.set 'views', root + '/views'
 
 # express middlewares
 app.use cors() # prevent any problem with CORS
