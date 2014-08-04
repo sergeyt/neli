@@ -1,6 +1,17 @@
 path = require 'path'
 express = require 'express'
 
+# express modules
+cors = require 'cors'
+morgan = require 'morgan'
+compression = require 'compression'
+cookieParser = require 'cookie-parser'
+methodOverride = require 'method-override'
+bodyParser = require 'body-parser'
+
+# app modules
+rest = require './rest'
+
 root = path.dirname __dirname
 
 app = express()
@@ -11,31 +22,30 @@ app.set 'host', 'http://localhost:' + app.get('port')
 app.set 'view engine', 'jade'
 app.set 'views', root + '/views'
 
-# config middlewares
-# Prevent any problem with CORS
-app.use (req, res, next) ->
-	res.header 'Access-Control-Allow-Origin', '*'
-	next()
-
-app.use(require('morgan')("dev", {}))
-app.use(require('compression')())
-app.use(require('cookie-parser')())
-app.use(require('body-parser')())
-app.use(require('method-override')())
+# express middlewares
+app.use cors() # prevent any problem with CORS
+app.use morgan("dev", {})
+app.use compression()
+app.use cookieParser()
+app.use bodyParser.json()
+app.use methodOverride()
 
 # static content
 app.use '/public', express.static root + '/public'
 
-# http handlers
-app.get '/', (req, res) ->
-	res.render 'index', {wikis: populateWikis()}
+# send any error as json
+app.use (req, res, next) ->
+	try
+		next()
+	catch error
+		res.send {error: error}
 
-# inject docs rest interface
-require('./rest')(app);
+# injecting app modules
+rest(app);
 
 # error handler
 app.use (req, res) ->
-	res.send 404, 'Sorry, cant find that!'
+	res.status(404).send 'Sorry, cant find that!'
 
 # now run server
 port = app.get 'port'

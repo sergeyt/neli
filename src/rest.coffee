@@ -1,30 +1,36 @@
 # rest api
+fs = require 'fs'
 path = require 'path'
 Nedb = require 'nedb'
 
 # export express app plugin
 module.exports = (app) ->
+	# list databases
+	app.get '/', (req, res) ->
+		# todo get list of databases from data dir
+		res.send(["docs"])
+
 	# collections api
-	app.get ':db', ls
-	app.route(':db/:collection')
+	app.get '/:db', list_collections
+	app.route('/:db/:collection')
 		.get(get_collection)
 		.post(add_doc)
 
 	# docs api
-	app.route(':db/:collection/:id')
+	app.route('/:db/:collection/:id')
 		.get(get_doc)
 		.delete(del_doc)
 		# TODO fix
 		#.update(update_doc)
 
 	# metadata
-	app.route(':db/:collection/:id/metadata')
+	app.route('/:db/:collection/:id/metadata')
 		.get(get_meta)
 		# TODO fix
 		#.update(update_meta)
 	
 	# permissions
-	app.route(':db/:collection/:id/permissions')
+	app.route('/:db/:collection/:id/permissions')
 		.get(get_permissions)
 		# TODO fix
 		#.update(set_permissions)
@@ -39,9 +45,17 @@ datadir = path.join root, 'data'
 load_db = (req) ->
 	dbname = req.params.db
 	colname = req.params.collection
+	console.log "loading #{dbname}/#{colname}"
+
+	# ensure data and db dirs
+	fs.mkdirSync datadir unless fs.existsSync datadir
+
 	dir = path.join datadir, dbname
-	db = new Nedb path.join(dir, colname)
-	db
+	fs.mkdirSync dir unless fs.existsSync dir
+
+	# load db
+	dbfile = path.join dir, colname + ".nedb"
+	new Nedb {filename: dbfile, autoload: true}
 
 serialize_doc = (doc) ->
 	# todo add metadata
@@ -52,9 +66,9 @@ send_docs = (res, err, docs) ->
 	res.send(docs.map serialize_doc)
 
 # lists databases
-ls = (req, res) ->
+list_collections = (req, res) ->
 	# todo get list of databases from data dir
-	res.send(["docs"])
+	res.send(["reports"])
 
 # GET db/collection handler
 # TODO support ?selector={}
