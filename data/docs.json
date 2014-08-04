@@ -1,0 +1,112 @@
+{
+"tags":[
+  {
+	"_id": "1",
+	"Name": "Financial Reports",
+	"Description": "Financial Reports",
+	"IsRoot": true,
+	"ChildTags": ["2", "5", "6"]
+  },
+  {
+    "_id": "2",
+    "Name": "Sales Reports",
+    "Description": "Sales Reports",
+    "IsRoot": false,
+    "ChildTags": ["3", "4"]
+  },
+  {
+    "_id": "3",
+    "Name": "City",
+    "Description": "Sales Reports by City",
+    "IsRoot": false,
+    "ChildTags": []
+  },
+  {
+    "_id": "4",
+    "Name": "Country",
+    "Description": "Sales Reports by Country",
+    "IsRoot": false,
+    "ChildTags": []
+  },
+  {
+    "_id": "5",
+    "Name": "Purchasing Reports",
+    "Description": "Purchasing Reports",
+    "IsRoot": false,
+    "ChildTags": []
+  },
+  {
+    "_id": "6",
+    "Name": "Other Reports",
+    "Description": "Other Reports",
+    "IsRoot": false,
+    "ChildTags": []
+  },
+  {
+    "_id": "7",
+    "Name": "Personnel Reports",
+    "Description": "Personel Reports",
+    "IsRoot": true,
+    "ChildTags": ["8", "9"]
+  },
+  {
+    "_id": "8",
+    "Name": "HR Reports",
+    "Description": "HR Reports",
+    "IsRoot": false,
+    "ChildTags": []
+  },
+  {
+    "_id": "9",
+    "Name": "Security Reports",
+    "Description": "Security Reports",
+    "IsRoot": false,
+    "ChildTags": []
+  }
+],
+
+"reports":[
+  {
+    "Name": "Sales by City",
+    "Description": "Sample Sales by City report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["3"]
+  },
+  {
+    "Name": "Sales by Country",
+    "Description": "Sample Sales by Country report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["4"]
+  },
+  {
+    "Name": "Purchasing Report",
+    "Description": "Sample Purchasing report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["5"]
+  },
+  {
+    "Name": "Invoice",
+    "Description": "Sample invoice report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["6"]
+  },
+  {
+    "Name": "HR Report",
+    "Description": "Sample HR Report report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["8"]
+  },
+  {
+    "Name": "Security Report",
+    "Description": "Sample Security report",
+    "Type": "SectionReport",
+	"Content": {"$file": "reports/invoice.rpx"},
+	"Tags": ["9"]
+  }
+]
+}

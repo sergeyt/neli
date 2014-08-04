@@ -47,6 +47,9 @@ rest(app);
 app.use (req, res) ->
 	res.status(404).send 'Sorry, cant find that!'
 
+# db init
+require('./dbinit')()
+
 # now run server
 port = app.get 'port'
 app.listen port

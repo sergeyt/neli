@@ -1,14 +1,19 @@
 # rest api
 fs = require 'fs'
 path = require 'path'
-Nedb = require 'nedb'
+db = require './db'
+
+root = path.dirname __dirname
+dataDir = path.join root, 'data'
 
 # export express app plugin
 module.exports = (app) ->
 	# list databases
 	app.get '/', (req, res) ->
-		# todo get list of databases from data dir
-		res.send(["docs"])
+		fs.readdir dataDir, (err, list) ->
+			return res.send {error: err} if err
+			res.send list.filter (name) ->
+				name.indexOf('.') < 0
 
 	# collections api
 	app.get '/:db', list_collections
@@ -35,27 +40,14 @@ module.exports = (app) ->
 		# TODO fix
 		#.update(set_permissions)
 
-# dirs
-root = path.dirname __dirname
-datadir = path.join root, 'data'
-
 # rest handlers
 
 # loads collection
-load_db = (req) ->
+load_collection = (req) ->
 	dbname = req.params.db
 	colname = req.params.collection
 	console.log "loading #{dbname}/#{colname}"
-
-	# ensure data and db dirs
-	fs.mkdirSync datadir unless fs.existsSync datadir
-
-	dir = path.join datadir, dbname
-	fs.mkdirSync dir unless fs.existsSync dir
-
-	# load db
-	dbfile = path.join dir, colname + ".nedb"
-	new Nedb {filename: dbfile, autoload: true}
+	db(dbname).collection(colname)
 
 serialize_doc = (doc) ->
 	# todo add metadata
@@ -70,16 +62,16 @@ list_collections = (req, res) ->
 	# todo get list of databases from data dir
 	res.send(["reports"])
 
-# GET db/collection handler
-# TODO support ?selector={}
+# GET db/collection?selector=query handler
 get_collection = (req, res) ->
-	db = load_db req
-	db.find {}, (err, docs) ->
+	db = load_collection req
+	selector = JSON.parse req.query.selector || "{}"
+	db.find selector, (err, docs) ->
 		send_docs(res, err, docs)
 
 # GET db/collection/id handler
 get_doc = (req, res, doc_handler) ->
-	db = load_db req
+	db = load_collection req
 	id = req.params.id
 	db.findOne {_id: id}, (err, doc) ->
 		return res.send {error: err} if err
@@ -88,7 +80,7 @@ get_doc = (req, res, doc_handler) ->
 
 # DELETE db/collection/id handler
 del_doc = (req, res) ->
-	db = load_db req
+	db = load_collection req
 	id = req.params.id
 	db.remove {_id: id}, (err, numRemoved) ->
 		return res.send {error: err} if err
@@ -96,7 +88,7 @@ del_doc = (req, res) ->
 
 # POST db/collection handler
 add_doc = (req, res) ->
-	db = load_db req
+	db = load_collection req
 	doc = req.body
 	now = new Date()
 	# todo get user from request
@@ -113,7 +105,7 @@ add_doc = (req, res) ->
 
 # UPDATE db/collection/id
 update_doc = (req, res, update_handler) ->
-	db = load_db req
+	db = load_collection req
 	id = req.params.id
 	# todo update last version
 	db.findOne {_id: id}, (err, doc) ->
