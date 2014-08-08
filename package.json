@@ -16,7 +16,7 @@
     "sergeyt <stodyshev@gmail.com>"
   ],
   "dependencies": {
-    "body-parser": "~1.5",
+    "body-parser": "~1.6",
     "coffee-script": "~1.7",
     "compression": "~1.0",
     "cookie-parser": "~1.3",
